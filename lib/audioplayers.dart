@@ -393,4 +393,18 @@ class AudioPlayer {
     if (!_completionController.isClosed) _completionController.close();
     if (!_errorController.isClosed) _errorController.close();
   }
+
+  // ===== Custom extensions =====
+
+  /// Enables more verbose logging.
+  static Future<void> setProgressUpdateInterval(
+      Duration newUpdateInterval) async {
+    await _channel.invokeMethod('setProgressUpdateInterval',
+        {'interval': '${newUpdateInterval.inMilliseconds}'});
+  }
+
+  static Future<Duration> getProgressUpdateInterval() async {
+    final value = await _channel.invokeMethod('getProgressUpdateInterval');
+    return Duration(milliseconds: value);
+  }
 }

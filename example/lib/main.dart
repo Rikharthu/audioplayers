@@ -15,7 +15,17 @@ const kUrl1 = 'https://luan.xyz/files/audio/ambient_c_motion.mp3';
 const kUrl2 = 'https://luan.xyz/files/audio/nasa_on_a_mission.mp3';
 const kUrl3 = 'http://bbcmedia.ic.llnwd.net/stream/bbcmedia_radio1xtra_mf_p';
 
+const PLAYER_PROGRESS_UPDATE_INTERVAL =
+    16; // 16 milliseconds ensure ~60 updates per second
+
 void main() {
+  AudioPlayer.setProgressUpdateInterval(Duration(milliseconds: 16));
+  AudioPlayer.getProgressUpdateInterval().then((interval) {
+    print("INTERVAL: $interval");
+    print("TYPE: ${interval.runtimeType}");
+  }).catchError((err) {
+    print("ERROR $err");
+  });
   runApp(new MaterialApp(home: new ExampleApp()));
 }
 

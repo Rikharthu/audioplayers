@@ -45,7 +45,12 @@ public class AudioplayersPlugin implements MethodCallHandler {
     private void handleMethodCall(final MethodCall call, final MethodChannel.Result response) {
         final String playerId = call.argument("playerId");
         final String mode = call.argument("mode");
-        final Player player = getPlayer(playerId, mode);
+        final Player player;
+        if (playerId != null && mode != null) {
+            player = getPlayer(playerId, mode);
+        } else {
+            player = null;
+        }
         switch (call.method) {
             case "play": {
                 final String url = call.argument("url");
@@ -99,6 +104,15 @@ public class AudioplayersPlugin implements MethodCallHandler {
                 final ReleaseMode releaseMode = ReleaseMode.valueOf(releaseModeName.substring("ReleaseMode.".length()));
                 player.setReleaseMode(releaseMode);
                 break;
+            }
+            case "setProgressUpdateInterval": {
+                final long newIntervalString = Long.parseLong((String) call.argument("interval"));
+                Configuration.setProgressUpdateInterval(newIntervalString);
+                break;
+            }
+            case "getProgressUpdateInterval": {
+                response.success(Configuration.getProgressUpdateInterval());
+                return;
             }
             default: {
                 response.notImplemented();
@@ -190,7 +204,7 @@ public class AudioplayersPlugin implements MethodCallHandler {
                     final int time = player.getCurrentPosition();
                     channel.invokeMethod("audio.onDuration", buildArguments(key, duration));
                     channel.invokeMethod("audio.onCurrentPosition", buildArguments(key, time));
-                } catch(UnsupportedOperationException e) {
+                } catch (UnsupportedOperationException e) {
 
                 }
             }
@@ -198,7 +212,7 @@ public class AudioplayersPlugin implements MethodCallHandler {
             if (nonePlaying) {
                 audioplayersPlugin.stopPositionUpdates();
             } else {
-                handler.postDelayed(this, 200);
+                handler.postDelayed(this, Configuration.getProgressUpdateInterval());
             }
         }
     }
